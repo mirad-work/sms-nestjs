@@ -131,6 +131,7 @@ If a release fails or you need to rollback:
    ```
 
 3. **Revert the version**:
+
    ```bash
    npm version 0.2.0 --no-git-tag-version
    git add package.json
