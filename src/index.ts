@@ -1,8 +1,8 @@
 /**
  * @mirad-work/sms-nestjs - NestJS adapter for @mirad-work/sms-core
- * 
+ *
  * A comprehensive NestJS module that provides SMS functionality through
- * the @mirad-work/sms-core library with proper dependency injection, 
+ * the @mirad-work/sms-core library with proper dependency injection,
  * configuration management, and NestJS best practices.
  */
 

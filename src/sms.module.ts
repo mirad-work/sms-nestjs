@@ -22,10 +22,10 @@ export class SmsModule {
 
   /**
    * Register SMS module synchronously with direct configuration
-   * 
+   *
    * @param options Module options with direct SMS configuration
    * @returns Dynamic module configuration
-   * 
+   *
    * @example
    * ```typescript
    * SmsModule.forRoot({
@@ -68,21 +68,21 @@ export class SmsModule {
 
   /**
    * Register SMS module asynchronously with factory, class, or existing provider
-   * 
+   *
    * @param options Async module options
    * @returns Dynamic module configuration
-   * 
+   *
    * @example Using factory with ConfigService:
    * ```typescript
    * SmsModule.forRootAsync({
    *   imports: [ConfigModule],
-   *   useFactory: (configService: ConfigService) => 
+   *   useFactory: (configService: ConfigService) =>
    *     NestSmsConfigHelper.createFromConfigService(configService),
    *   inject: [ConfigService],
    *   isGlobal: true
    * })
    * ```
-   * 
+   *
    * @example Using class:
    * ```typescript
    * SmsModule.forRootAsync({
@@ -112,9 +112,9 @@ export class SmsModule {
    * Create a feature module that uses an existing SMS configuration
    * This is useful when you want to use SMS service in a feature module
    * without reconfiguring it
-   * 
+   *
    * @returns Dynamic module configuration for feature use
-   * 
+   *
    * @example
    * ```typescript
    * @Module({
@@ -136,10 +136,10 @@ export class SmsModule {
    * Create SMS module with environment-based configuration
    * This is a convenience method that automatically reads configuration
    * from environment variables using NestJS ConfigService
-   * 
+   *
    * @param options Configuration options
    * @returns Dynamic module configuration
-   * 
+   *
    * @example
    * ```typescript
    * SmsModule.forEnvironment({
@@ -148,10 +148,12 @@ export class SmsModule {
    * })
    * ```
    */
-  static forEnvironment(options: {
-    imports?: any[];
-    isGlobal?: boolean;
-  } = {}): DynamicModule {
+  static forEnvironment(
+    options: {
+      imports?: any[];
+      isGlobal?: boolean;
+    } = {}
+  ): DynamicModule {
     return this.forRootAsync({
       imports: options.imports || [],
       useFactory: (configService: ConfigService) =>
@@ -164,10 +166,10 @@ export class SmsModule {
   /**
    * Create SMS module for testing with mock configuration
    * This automatically sets up a mock SMS service for testing
-   * 
+   *
    * @param options Mock configuration options
    * @returns Dynamic module configuration for testing
-   * 
+   *
    * @example
    * ```typescript
    * SmsModule.forTesting({
@@ -176,11 +178,13 @@ export class SmsModule {
    * })
    * ```
    */
-  static forTesting(options: {
-    shouldFail?: boolean;
-    delay?: number;
-    isGlobal?: boolean;
-  } = {}): DynamicModule {
+  static forTesting(
+    options: {
+      shouldFail?: boolean;
+      delay?: number;
+      isGlobal?: boolean;
+    } = {}
+  ): DynamicModule {
     const config = NestSmsConfigHelper.createForTesting({
       shouldFail: options.shouldFail,
       delay: options.delay,
@@ -197,7 +201,9 @@ export class SmsModule {
   /**
    * Create providers for async configuration
    */
-  private static createAsyncProviders(options: SmsModuleAsyncOptions): Provider[] {
+  private static createAsyncProviders(
+    options: SmsModuleAsyncOptions
+  ): Provider[] {
     if (options.useExisting || options.useFactory) {
       return [this.createAsyncOptionsProvider(options)];
     }
@@ -213,14 +219,16 @@ export class SmsModule {
     }
 
     throw new Error(
-      'Invalid SMS module async configuration. Must provide useFactory, useClass, or useExisting.',
+      'Invalid SMS module async configuration. Must provide useFactory, useClass, or useExisting.'
     );
   }
 
   /**
    * Create async options provider
    */
-  private static createAsyncOptionsProvider(options: SmsModuleAsyncOptions): Provider {
+  private static createAsyncOptionsProvider(
+    options: SmsModuleAsyncOptions
+  ): Provider {
     if (options.useFactory) {
       return {
         provide: SMS_CONFIG,
@@ -232,8 +240,9 @@ export class SmsModule {
     if (options.useExisting) {
       return {
         provide: SMS_CONFIG,
-        useFactory: async (optionsFactory: SmsOptionsFactory): Promise<ISmsConfig> =>
-          optionsFactory.createSmsOptions(),
+        useFactory: async (
+          optionsFactory: SmsOptionsFactory
+        ): Promise<ISmsConfig> => optionsFactory.createSmsOptions(),
         inject: [options.useExisting],
       };
     }
@@ -241,14 +250,15 @@ export class SmsModule {
     if (options.useClass) {
       return {
         provide: SMS_CONFIG,
-        useFactory: async (optionsFactory: SmsOptionsFactory): Promise<ISmsConfig> =>
-          optionsFactory.createSmsOptions(),
+        useFactory: async (
+          optionsFactory: SmsOptionsFactory
+        ): Promise<ISmsConfig> => optionsFactory.createSmsOptions(),
         inject: [options.useClass],
       };
     }
 
     throw new Error(
-      'Invalid SMS module async configuration. Must provide useFactory, useClass, or useExisting.',
+      'Invalid SMS module async configuration. Must provide useFactory, useClass, or useExisting.'
     );
   }
 }
