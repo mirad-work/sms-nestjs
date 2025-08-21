@@ -1,0 +1,42 @@
+{
+    "name": "@mirad-work/sms-nestjs",
+    "version": "0.2.0",
+    "description": "NestJS adapter for @mirad-work/sms-core",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "peerDependencies": {
+        "@nestjs/common": "^8.0.0 || ^9.0.0 || ^10.0.0",
+        "@nestjs/config": "^2.0.0 || ^3.0.0",
+        "@mirad-work/sms-core": "^0.1.0"
+    },
+    "devDependencies": {
+        "@nestjs/common": "^10.0.0",
+        "@nestjs/config": "^3.0.0",
+        "@nestjs/testing": "^10.0.0",
+        "@mirad-work/sms-core": "^0.2.0",
+        "@types/jest": "^29.5.0",
+        "@types/node": "^20.0.0",
+        "@typescript-eslint/eslint-plugin": "^6.0.0",
+        "@typescript-eslint/parser": "^6.0.0",
+        "eslint": "^8.0.0",
+        "jest": "^29.5.0",
+        "prettier": "^3.0.0",
+        "reflect-metadata": "^0.1.13",
+        "rimraf": "^5.0.0",
+        "rxjs": "^7.8.0",
+        "ts-jest": "^29.1.0",
+        "typescript": "^5.0.0"
+    },
+    "scripts": {
+        "build": "npm run clean && tsc",
+        "build:watch": "tsc --watch",
+        "clean": "rimraf dist",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage",
+        "lint": "eslint src/**/*.ts",
+        "lint:fix": "eslint src/**/*.ts --fix",
+        "format": "prettier --write \"src/**/*.{ts,js,json}\"",
+        "format:check": "prettier --check \"src/**/*.{ts,js,json}\""
+    }
+}
