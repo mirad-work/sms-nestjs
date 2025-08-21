@@ -6,7 +6,6 @@ import {
   SmsModuleAsyncOptions,
   SmsOptionsFactory,
   SMS_MODULE_OPTIONS,
-  SMS_CONFIG,
 } from './interfaces/sms-module-options.interface';
 import { SmsService } from './sms.service';
 import { NestSmsConfigHelper } from './sms.config';
@@ -50,7 +49,7 @@ export class SmsModule {
         useValue: options,
       },
       {
-        provide: SMS_CONFIG,
+        provide: 'SMS_CONFIG',
         useValue: options.config,
       },
       SmsService,
@@ -231,7 +230,7 @@ export class SmsModule {
   ): Provider {
     if (options.useFactory) {
       return {
-        provide: SMS_CONFIG,
+        provide: 'SMS_CONFIG',
         useFactory: options.useFactory,
         inject: options.inject || [],
       };
@@ -239,7 +238,7 @@ export class SmsModule {
 
     if (options.useExisting) {
       return {
-        provide: SMS_CONFIG,
+        provide: 'SMS_CONFIG',
         useFactory: async (
           optionsFactory: SmsOptionsFactory
         ): Promise<ISmsConfig> => optionsFactory.createSmsOptions(),
@@ -249,7 +248,7 @@ export class SmsModule {
 
     if (options.useClass) {
       return {
-        provide: SMS_CONFIG,
+        provide: 'SMS_CONFIG',
         useFactory: async (
           optionsFactory: SmsOptionsFactory
         ): Promise<ISmsConfig> => optionsFactory.createSmsOptions(),

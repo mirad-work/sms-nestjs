@@ -16,7 +16,7 @@ export class NestSmsConfigHelper {
       'SMS_DEFAULT_DRIVER',
       DriverType.KAVENEGAR
     );
-    const timeout = configService.get<number>('SMS_TIMEOUT', 10000);
+    const timeout = parseInt(configService.get<string>('SMS_TIMEOUT', '10000'), 10);
 
     const config: ISmsConfig = {
       defaultDriver,
@@ -77,7 +77,7 @@ export class NestSmsConfigHelper {
       config.drivers.mock = {
         shouldFail:
           configService.get<string>('SMS_MOCK_SHOULD_FAIL') === 'true',
-        delay: configService.get<number>('SMS_MOCK_DELAY', 0),
+        delay: parseInt(configService.get<string>('SMS_MOCK_DELAY', '0'), 10),
       };
     }
 

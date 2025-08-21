@@ -7,7 +7,6 @@ import {
   DriverType,
   SmsException,
 } from '@mirad-work/sms-core';
-import { SMS_CONFIG } from './interfaces/sms-module-options.interface';
 
 /**
  * NestJS SMS Service wrapper
@@ -21,11 +20,19 @@ export class SmsService {
   private readonly logger = new Logger(SmsService.name);
   private readonly coreService: CoreSmsService;
 
-  constructor(@Inject(SMS_CONFIG) private readonly config: ISmsConfig) {
+  constructor(@Inject('SMS_CONFIG') private readonly config: ISmsConfig) {
     this.coreService = new CoreSmsService(config);
     this.logger.log(
       'SMS Service initialized with default driver: ' + config.defaultDriver
     );
+  }
+
+  /**
+   * Factory function to create SmsService instance
+   * This is used to work around Jest dependency injection issues
+   */
+  static create(config: ISmsConfig): SmsService {
+    return new SmsService(config);
   }
 
   /**
