@@ -16,7 +16,10 @@ export class NestSmsConfigHelper {
       'SMS_DEFAULT_DRIVER',
       DriverType.KAVENEGAR
     );
-    const timeout = parseInt(configService.get<string>('SMS_TIMEOUT', '10000'), 10);
+    const timeout = parseInt(
+      configService.get<string>('SMS_TIMEOUT', '10000'),
+      10
+    );
 
     const config: ISmsConfig = {
       defaultDriver,
@@ -66,6 +69,21 @@ export class NestSmsConfigHelper {
         url: melipayamakUrl || 'https://console.melipayamak.com/api/',
         apiKey: melipayamakApiKey || '',
         lineNumber: melipayamakLineNumber || '',
+      };
+    }
+
+    // IPPanel configuration
+    const ippanelUrl = configService.get<string>('SMS_IPPANEL_URL');
+    const ippanelApiKey = configService.get<string>('SMS_IPPANEL_API_KEY');
+    const ippanelLineNumber = configService.get<string>(
+      'SMS_IPPANEL_LINE_NUMBER'
+    );
+
+    if (ippanelUrl || ippanelApiKey) {
+      config.drivers.ippanel = {
+        url: ippanelUrl || 'https://api2.ippanel.com/',
+        apiKey: ippanelApiKey || '',
+        lineNumber: ippanelLineNumber || '',
       };
     }
 
@@ -142,6 +160,12 @@ export class NestSmsConfigHelper {
             configService.get('SMS_MELIPAYAMAK_LINE_NUMBER')
         );
 
+      case DriverType.IPPANEL:
+        return Boolean(
+          configService.get('SMS_IPPANEL_API_KEY') &&
+            configService.get('SMS_IPPANEL_LINE_NUMBER')
+        );
+
       case DriverType.MOCK:
         return true; // Mock driver doesn't require specific env vars
 
@@ -186,6 +210,15 @@ export class NestSmsConfigHelper {
           missing.push('SMS_MELIPAYAMAK_LINE_NUMBER');
         }
         break;
+
+      case DriverType.IPPANEL:
+        if (!configService.get('SMS_IPPANEL_API_KEY')) {
+          missing.push('SMS_IPPANEL_API_KEY');
+        }
+        if (!configService.get('SMS_IPPANEL_LINE_NUMBER')) {
+          missing.push('SMS_IPPANEL_LINE_NUMBER');
+        }
+        break;
     }
 
     return missing;
@@ -219,6 +252,11 @@ SMS_SMSIR_LINE_NUMBER=your-smsir-line-number
 SMS_MELIPAYAMAK_URL=https://console.melipayamak.com/api/
 SMS_MELIPAYAMAK_API_KEY=your-melipayamak-api-key
 SMS_MELIPAYAMAK_LINE_NUMBER=your-melipayamak-line-number
+
+# IPPanel Configuration
+SMS_IPPANEL_URL=https://api2.ippanel.com/
+SMS_IPPANEL_API_KEY=your-ippanel-api-key
+SMS_IPPANEL_LINE_NUMBER=your-ippanel-line-number
 
 # Mock Driver Configuration (for testing)
 SMS_USE_MOCK=false

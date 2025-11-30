@@ -6,7 +6,7 @@ A comprehensive NestJS adapter for [@mirad-work/sms-core](https://github.com/mir
 
 - **🏗️ NestJS Integration**: First-class NestJS module with dependency injection support
 - **🔧 Multiple Configuration Options**: Sync, async, factory-based, and environment-based configuration
-- **📱 Multi-Provider Support**: Kavenegar, SMS.ir, Melipayamak, and Mock (for testing)
+- **📱 Multi-Provider Support**: Kavenegar, SMS.ir, Melipayamak, IPPanel, and Mock (for testing)
 - **🛡️ Robust Error Handling**: Comprehensive error handling with proper NestJS exceptions
 - **🔄 Retry & Fallback**: Built-in retry mechanisms and fallback driver support
 - **📊 Bulk Operations**: Efficient bulk SMS sending with concurrency control
@@ -211,6 +211,10 @@ export class AppModule {}
 | `SMS_MELIPAYAMAK_URL` | Melipayamak API URL | `https://console.melipayamak.com/api/` |
 | `SMS_MELIPAYAMAK_API_KEY` | Melipayamak API key | - |
 | `SMS_MELIPAYAMAK_LINE_NUMBER` | Melipayamak line number | - |
+| **IPPanel** |
+| `SMS_IPPANEL_URL` | IPPanel API URL | `https://api2.ippanel.com/` |
+| `SMS_IPPANEL_API_KEY` | IPPanel API key | - |
+| `SMS_IPPANEL_LINE_NUMBER` | IPPanel line number | - |
 | **Mock (Testing)** |
 | `SMS_USE_MOCK` | Use mock driver | `false` |
 | `SMS_MOCK_SHOULD_FAIL` | Mock driver should fail | `false` |
