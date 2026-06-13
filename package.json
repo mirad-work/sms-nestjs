@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "peerDependencies": {
-    "@mirad-work/sms-core": "^0.4.0",
+    "@mirad-work/sms-core": "^0.5.0",
     "@nestjs/common": "^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0",
     "@nestjs/config": "^2.0.0 || ^3.0.0 || ^4.0.0"
   },
@@ -16,7 +16,7 @@
     "@babel/plugin-transform-class-properties": "^7.27.1",
     "@babel/preset-env": "^7.28.3",
     "@babel/preset-typescript": "^7.27.1",
-    "@mirad-work/sms-core": "^0.4.0",
+    "@mirad-work/sms-core": "^0.5.0",
     "@nestjs/common": "^11.0.0",
     "@nestjs/config": "^4.0.0",
     "@nestjs/testing": "^11.0.0",
@@ -52,7 +52,7 @@
     "validate": "npm run typecheck && npm run lint:check && npm run test:ci",
     "prepublishOnly": "npm run validate && npm run build",
     "preversion": "npm run validate",
-    "postversion": "git push && git push --tags",
+    "postversion": "git push github main && git push github --tags",
     "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\"",
     "ci": "npm run validate && npm run build"
