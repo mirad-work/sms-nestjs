@@ -208,9 +208,9 @@ export class AppModule {}
 | `SMS_SMSIR_API_KEY` | SMS.ir API key | - |
 | `SMS_SMSIR_LINE_NUMBER` | SMS.ir line number | - |
 | **Melipayamak** |
-| `SMS_MELIPAYAMAK_URL` | Melipayamak API URL | `https://console.melipayamak.com/api/` |
-| `SMS_MELIPAYAMAK_API_KEY` | Melipayamak API key | - |
-| `SMS_MELIPAYAMAK_LINE_NUMBER` | Melipayamak line number | - |
+| `SMS_MELIPAYAMAK_URL` | Melipayamak API URL | `https://rest.payamak-panel.com/api/SendSMS/` |
+| `SMS_MELIPAYAMAK_USERNAME` | Melipayamak account username | - |
+| `SMS_MELIPAYAMAK_PASSWORD` | Melipayamak password or API key | - |
 | **IPPanel** |
 | `SMS_IPPANEL_URL` | IPPanel API URL | `https://api2.ippanel.com/` |
 | `SMS_IPPANEL_API_KEY` | IPPanel API key | - |

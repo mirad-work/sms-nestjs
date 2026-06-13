@@ -57,18 +57,19 @@ export class NestSmsConfigHelper {
 
     // Melipayamak configuration
     const melipayamakUrl = configService.get<string>('SMS_MELIPAYAMAK_URL');
-    const melipayamakApiKey = configService.get<string>(
-      'SMS_MELIPAYAMAK_API_KEY'
+    const melipayamakUsername = configService.get<string>(
+      'SMS_MELIPAYAMAK_USERNAME'
     );
-    const melipayamakLineNumber = configService.get<string>(
-      'SMS_MELIPAYAMAK_LINE_NUMBER'
-    );
+    const melipayamakPassword =
+      configService.get<string>('SMS_MELIPAYAMAK_PASSWORD') ||
+      configService.get<string>('SMS_MELIPAYAMAK_API_KEY');
 
-    if (melipayamakUrl || melipayamakApiKey) {
+    if (melipayamakUrl || melipayamakUsername || melipayamakPassword) {
       config.drivers.melipayamak = {
-        url: melipayamakUrl || 'https://console.melipayamak.com/api/',
-        apiKey: melipayamakApiKey || '',
-        lineNumber: melipayamakLineNumber || '',
+        url:
+          melipayamakUrl || 'https://rest.payamak-panel.com/api/SendSMS/',
+        username: melipayamakUsername || '',
+        password: melipayamakPassword || '',
       };
     }
 
@@ -156,8 +157,9 @@ export class NestSmsConfigHelper {
 
       case DriverType.MELIPAYAMAK:
         return Boolean(
-          configService.get('SMS_MELIPAYAMAK_API_KEY') &&
-            configService.get('SMS_MELIPAYAMAK_LINE_NUMBER')
+          configService.get('SMS_MELIPAYAMAK_USERNAME') &&
+            (configService.get('SMS_MELIPAYAMAK_PASSWORD') ||
+              configService.get('SMS_MELIPAYAMAK_API_KEY'))
         );
 
       case DriverType.IPPANEL:
@@ -203,11 +205,14 @@ export class NestSmsConfigHelper {
         break;
 
       case DriverType.MELIPAYAMAK:
-        if (!configService.get('SMS_MELIPAYAMAK_API_KEY')) {
-          missing.push('SMS_MELIPAYAMAK_API_KEY');
+        if (!configService.get('SMS_MELIPAYAMAK_USERNAME')) {
+          missing.push('SMS_MELIPAYAMAK_USERNAME');
         }
-        if (!configService.get('SMS_MELIPAYAMAK_LINE_NUMBER')) {
-          missing.push('SMS_MELIPAYAMAK_LINE_NUMBER');
+        if (
+          !configService.get('SMS_MELIPAYAMAK_PASSWORD') &&
+          !configService.get('SMS_MELIPAYAMAK_API_KEY')
+        ) {
+          missing.push('SMS_MELIPAYAMAK_PASSWORD');
         }
         break;
 
@@ -249,9 +254,9 @@ SMS_SMSIR_API_KEY=your-smsir-api-key
 SMS_SMSIR_LINE_NUMBER=your-smsir-line-number
 
 # Melipayamak Configuration
-SMS_MELIPAYAMAK_URL=https://console.melipayamak.com/api/
-SMS_MELIPAYAMAK_API_KEY=your-melipayamak-api-key
-SMS_MELIPAYAMAK_LINE_NUMBER=your-melipayamak-line-number
+SMS_MELIPAYAMAK_URL=https://rest.payamak-panel.com/api/SendSMS/
+SMS_MELIPAYAMAK_USERNAME=your-melipayamak-username
+SMS_MELIPAYAMAK_PASSWORD=your-melipayamak-password-or-api-key
 
 # IPPanel Configuration
 SMS_IPPANEL_URL=https://api2.ippanel.com/
