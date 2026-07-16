@@ -31,6 +31,7 @@ export {
   IKavenegarConfig,
   ISmsIrConfig,
   IMelipayamakConfig,
+  IIppanelConfig,
   IMockConfig,
   DriverType,
   SmsStatus,
@@ -51,4 +52,5 @@ export {
   createKavenegarSmsService,
   createSmsIrSmsService,
   createMelipayamakSmsService,
+  createIppanelSmsService,
 } from '@mirad-work/sms-core';

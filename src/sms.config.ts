@@ -7,6 +7,35 @@ import { ISmsConfig, SmsConfigManager, DriverType } from '@mirad-work/sms-core';
  */
 export class NestSmsConfigHelper {
   /**
+   * Parse a numeric config value, falling back to a default when the value is
+   * absent or not a usable number.
+   *
+   * Without this, a malformed value (e.g. SMS_TIMEOUT=fast) yields NaN, which
+   * silently aborts every request because setTimeout(fn, NaN) fires immediately.
+   */
+  private static parseNumber(
+    value: string | undefined,
+    fallback: number,
+    { allowZero = false }: { allowZero?: boolean } = {}
+  ): number {
+    if (value === undefined || String(value).trim() === '') {
+      return fallback;
+    }
+
+    const parsed = Number(value);
+
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      return fallback;
+    }
+
+    if (parsed === 0 && !allowZero) {
+      return fallback;
+    }
+
+    return parsed;
+  }
+
+  /**
    * Create SMS configuration from NestJS ConfigService
    * This method reads environment variables using NestJS ConfigService
    * and creates a proper ISmsConfig object
@@ -16,9 +45,9 @@ export class NestSmsConfigHelper {
       'SMS_DEFAULT_DRIVER',
       DriverType.KAVENEGAR
     );
-    const timeout = parseInt(
-      configService.get<string>('SMS_TIMEOUT', '10000'),
-      10
+    const timeout = NestSmsConfigHelper.parseNumber(
+      configService.get<string>('SMS_TIMEOUT'),
+      10000
     );
 
     const config: ISmsConfig = {
@@ -96,7 +125,11 @@ export class NestSmsConfigHelper {
       config.drivers.mock = {
         shouldFail:
           configService.get<string>('SMS_MOCK_SHOULD_FAIL') === 'true',
-        delay: parseInt(configService.get<string>('SMS_MOCK_DELAY', '0'), 10),
+        delay: NestSmsConfigHelper.parseNumber(
+          configService.get<string>('SMS_MOCK_DELAY'),
+          0,
+          { allowZero: true }
+        ),
       };
     }
 

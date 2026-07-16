@@ -6,6 +6,7 @@ import {
   SmsModuleAsyncOptions,
   SmsOptionsFactory,
   SMS_MODULE_OPTIONS,
+  SMS_CONFIG,
 } from './interfaces/sms-module-options.interface';
 import { SmsService } from './sms.service';
 import { NestSmsConfigHelper } from './sms.config';
@@ -49,7 +50,7 @@ export class SmsModule {
         useValue: options,
       },
       {
-        provide: 'SMS_CONFIG',
+        provide: SMS_CONFIG,
         useValue: options.config,
       },
       SmsService,
@@ -60,7 +61,7 @@ export class SmsModule {
     return {
       module: SmsModule,
       providers,
-      exports: [SmsService],
+      exports: [SmsService, SMS_CONFIG],
       global: options.isGlobal,
     };
   }
@@ -102,7 +103,7 @@ export class SmsModule {
       module: SmsModule,
       imports: options.imports || [],
       providers,
-      exports: [SmsService],
+      exports: [SmsService, SMS_CONFIG],
       global: options.isGlobal,
     };
   }
@@ -112,10 +113,18 @@ export class SmsModule {
    * This is useful when you want to use SMS service in a feature module
    * without reconfiguring it
    *
+   * Requires the root module to have been registered as global
+   * (`isGlobal: true`), since that is what makes the SMS configuration
+   * visible to this module. Without it, Nest cannot resolve SmsService here.
+   *
    * @returns Dynamic module configuration for feature use
    *
    * @example
    * ```typescript
+   * // app.module.ts
+   * SmsModule.forRoot({ config, isGlobal: true })
+   *
+   * // user.module.ts
    * @Module({
    *   imports: [SmsModule.forFeature()],
    *   // ...
@@ -230,7 +239,7 @@ export class SmsModule {
   ): Provider {
     if (options.useFactory) {
       return {
-        provide: 'SMS_CONFIG',
+        provide: SMS_CONFIG,
         useFactory: options.useFactory,
         inject: options.inject || [],
       };
@@ -238,7 +247,7 @@ export class SmsModule {
 
     if (options.useExisting) {
       return {
-        provide: 'SMS_CONFIG',
+        provide: SMS_CONFIG,
         useFactory: async (
           optionsFactory: SmsOptionsFactory
         ): Promise<ISmsConfig> => optionsFactory.createSmsOptions(),
@@ -248,7 +257,7 @@ export class SmsModule {
 
     if (options.useClass) {
       return {
-        provide: 'SMS_CONFIG',
+        provide: SMS_CONFIG,
         useFactory: async (
           optionsFactory: SmsOptionsFactory
         ): Promise<ISmsConfig> => optionsFactory.createSmsOptions(),
