@@ -54,3 +54,5 @@ temp/
 
 # TypeScript
 *.tsbuildinfo
+
+graphify-out/
