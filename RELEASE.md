@@ -4,7 +4,8 @@ This document explains how to release a new version of `@mirad-work/sms-nestjs` 
 
 ## Prerequisites
 
-1. **NPM Token**: Ensure you have an NPM token configured in your GitHub repository secrets as `NPM_TOKEN`
+1. **NPM Token**: Ensure a current granular npm token with publish permission and 2FA bypass is
+   configured in GitHub Actions secrets as `NPM_TOKEN`
 2. **Repository Access**: You need push access to the repository to create tags
 
 ## Release Steps
@@ -48,6 +49,9 @@ When you run `npm version`, it will automatically:
 2. **Version Update**: Update `package.json` version
 3. **Git Operations**: Create a commit and tag
 4. **Post-version Hook**: Push changes and tags to GitHub
+
+For this adapter, publish the required `@mirad-work/sms-core` version first, regenerate the
+lockfile from the public npm registry, and verify it with `npm ci` before creating the adapter tag.
 
 ### 4. GitHub Actions Workflow
 
