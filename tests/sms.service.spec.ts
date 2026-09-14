@@ -132,7 +132,7 @@ describe('SmsService', () => {
       await service.verify(message);
 
       expect(logSpy).toHaveBeenCalledWith(
-        expect.stringContaining('SMS sent successfully')
+        expect.stringContaining('SMS accepted by')
       );
     });
 
@@ -179,6 +179,8 @@ describe('SmsService', () => {
         template: 'verify',
         tokens: { code: '123456' },
         driver: undefined,
+        fallback: undefined,
+        requestId: undefined,
       });
     });
 
@@ -218,6 +220,8 @@ describe('SmsService', () => {
       expect(info).toHaveProperty('availableDrivers');
       expect(info).toHaveProperty('timeout');
       expect(info).toHaveProperty('driversConfigured');
+      expect(info).toHaveProperty('fallbackEnabled', false);
+      expect(info).toHaveProperty('fallbackOrder');
 
       expect(info.defaultDriver).toBe(DriverType.MOCK);
       expect(Array.isArray(info.availableDrivers)).toBe(true);
@@ -427,6 +431,48 @@ describe('NestSmsConfigHelper', () => {
     expect(config.drivers.mock).toBeDefined(); // Because SMS_USE_MOCK is true
   });
 
+  it('parses, validates and de-duplicates the fallback environment order', () => {
+    const config = NestSmsConfigHelper.createFromConfigService(
+      new ConfigService({
+        SMS_DEFAULT_DRIVER: 'mock',
+        SMS_USE_MOCK: 'true',
+        SMS_FALLBACK_ENABLED: 'true',
+        SMS_FALLBACK_ORDER: 'smsir, melipayamak,smsir,invalid,ippanel',
+      })
+    );
+
+    expect(config.fallback).toEqual({
+      enabled: true,
+      order: [DriverType.SMSIR, DriverType.MELIPAYAMAK, DriverType.IPPANEL],
+    });
+  });
+
+  it('uses the core fallback engine through the NestJS service contract', async () => {
+    const fallbackService = SmsService.create({
+      defaultDriver: DriverType.MOCK,
+      drivers: { mock: { shouldFail: true } },
+      fallback: {
+        enabled: true,
+        order: [DriverType.SMSIR, DriverType.IPPANEL],
+      },
+    });
+
+    const result = await fallbackService.verify({
+      to: '+989123456789',
+      template: 'verify',
+      tokens: { code: '123456' },
+    });
+
+    expect(result.errorCode).toBe('ALL_DRIVERS_FAILED');
+    expect(
+      result.attempts?.map(({ driver, outcome }) => [driver, outcome])
+    ).toEqual([
+      [DriverType.MOCK, 'rejected'],
+      [DriverType.SMSIR, 'skipped'],
+      [DriverType.IPPANEL, 'skipped'],
+    ]);
+  });
+
   it('should validate driver environment variables', () => {
     const isValid = NestSmsConfigHelper.validateDriverEnvironment(
       DriverType.KAVENEGAR,
@@ -443,7 +489,7 @@ describe('NestSmsConfigHelper', () => {
     );
 
     expect(missing).toContain('SMS_KAVENEGAR_API_KEY');
-    expect(missing).toContain('SMS_KAVENEGAR_LINE_NUMBER');
+    expect(missing).not.toContain('SMS_KAVENEGAR_LINE_NUMBER');
   });
 
   it('should create testing configuration', () => {
@@ -464,5 +510,7 @@ describe('NestSmsConfigHelper', () => {
     expect(sample).toContain('SMS_DEFAULT_DRIVER');
     expect(sample).toContain('SMS_KAVENEGAR_API_KEY');
     expect(sample).toContain('SMS_SMSIR_API_KEY');
+    expect(sample).toContain('SMS_FALLBACK_ENABLED');
+    expect(sample).toContain('SMS_FALLBACK_ORDER');
   });
 });

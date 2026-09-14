@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+### Added
+
+- NestJS configuration parsing and public re-exports for core multi-driver fallback.
+- Service metadata for fallback activation/order and adapter-level fallback contract tests.
+- Documentation for safe fallback, provider overrides, and database resolver/observer hooks.
+
+### Changed
+
+- Success logs report the accepting driver and request correlation ID.
+- `healthCheck()` is documented as configuration health, not a live provider probe.
+- Kavenegar and SMS.ir environment validation no longer requires unused line numbers.
+
 ## [0.5.0] - 2026-07-16
 
 ### Changed
@@ -12,7 +26,7 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **BREAKING CHANGE**: the SMS configuration is now provided under the exported `SMS_CONFIG` symbol
   instead of the string token `'SMS_CONFIG'`
   - `SMS_CONFIG` was already exported and documented as the injection token, but the module
-    registered the config under the *string* `'SMS_CONFIG'`. Injecting the documented symbol failed
+    registered the config under the _string_ `'SMS_CONFIG'`. Injecting the documented symbol failed
     with `Nest can't resolve dependencies`, so the exported token was unusable.
   - If you inject the configuration directly, import the token instead of using the string literal:
 

@@ -66,7 +66,7 @@ export class SmsService {
 
       if (response.success) {
         this.logger.log(
-          `SMS sent successfully to ${message.to} in ${duration}ms (ID: ${response.messageId})`
+          `SMS accepted by ${response.driver || message.driver || this.config.defaultDriver} in ${duration}ms (ID: ${response.messageId}, request: ${response.requestId})`
         );
       } else {
         this.logger.warn(
@@ -109,6 +109,8 @@ export class SmsService {
     tokens: Record<string, unknown> | unknown[],
     options: {
       driver?: DriverType;
+      fallback?: boolean;
+      requestId?: string;
     } = {}
   ): ISmsMessage {
     return this.coreService.createVerificationMessage(
@@ -158,11 +160,15 @@ export class SmsService {
     availableDrivers: DriverType[];
     timeout: number;
     driversConfigured: string[];
+    fallbackEnabled: boolean;
+    fallbackOrder: DriverType[];
   } {
     return {
       defaultDriver: this.getDefaultDriver(),
       availableDrivers: this.getAvailableDrivers(),
       timeout: this.config.timeout || 10000,
+      fallbackEnabled: this.config.fallback?.enabled === true,
+      fallbackOrder: [...(this.config.fallback?.order || [])],
       driversConfigured: Object.keys(this.config.drivers).filter(
         key => this.config.drivers[key as DriverType]
       ),

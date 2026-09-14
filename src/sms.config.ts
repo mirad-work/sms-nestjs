@@ -53,6 +53,12 @@ export class NestSmsConfigHelper {
     const config: ISmsConfig = {
       defaultDriver,
       timeout,
+      fallback: {
+        enabled: configService.get<string>('SMS_FALLBACK_ENABLED') === 'true',
+        order: NestSmsConfigHelper.parseDriverOrder(
+          configService.get<string>('SMS_FALLBACK_ORDER')
+        ),
+      },
       drivers: {},
     };
 
@@ -95,8 +101,7 @@ export class NestSmsConfigHelper {
 
     if (melipayamakUrl || melipayamakUsername || melipayamakPassword) {
       config.drivers.melipayamak = {
-        url:
-          melipayamakUrl || 'https://rest.payamak-panel.com/api/SendSMS/',
+        url: melipayamakUrl || 'https://rest.payamak-panel.com/api/SendSMS/',
         username: melipayamakUsername || '',
         password: melipayamakPassword || '',
       };
@@ -136,6 +141,22 @@ export class NestSmsConfigHelper {
     return config;
   }
 
+  private static parseDriverOrder(value: string | undefined): DriverType[] {
+    if (!value) return [];
+
+    const validDrivers = new Set(Object.values(DriverType));
+    return Array.from(
+      new Set(
+        value
+          .split(',')
+          .map(driver => driver.trim())
+          .filter((driver): driver is DriverType =>
+            validDrivers.has(driver as DriverType)
+          )
+      )
+    );
+  }
+
   /**
    * Create a configuration factory function for NestJS async module setup
    * This is commonly used with useFactory in forRootAsync
@@ -152,6 +173,7 @@ export class NestSmsConfigHelper {
     options: {
       shouldFail?: boolean;
       delay?: number;
+      failureMode?: 'rejected' | 'timeout' | 'network' | 'unexpected';
     } = {}
   ): ISmsConfig {
     return SmsConfigManager.createForTesting(options);
@@ -177,28 +199,22 @@ export class NestSmsConfigHelper {
   ): boolean {
     switch (driverType) {
       case DriverType.KAVENEGAR:
-        return Boolean(
-          configService.get('SMS_KAVENEGAR_API_KEY') &&
-            configService.get('SMS_KAVENEGAR_LINE_NUMBER')
-        );
+        return Boolean(configService.get('SMS_KAVENEGAR_API_KEY'));
 
       case DriverType.SMSIR:
-        return Boolean(
-          configService.get('SMS_SMSIR_API_KEY') &&
-            configService.get('SMS_SMSIR_LINE_NUMBER')
-        );
+        return Boolean(configService.get('SMS_SMSIR_API_KEY'));
 
       case DriverType.MELIPAYAMAK:
         return Boolean(
           configService.get('SMS_MELIPAYAMAK_USERNAME') &&
-            (configService.get('SMS_MELIPAYAMAK_PASSWORD') ||
-              configService.get('SMS_MELIPAYAMAK_API_KEY'))
+          (configService.get('SMS_MELIPAYAMAK_PASSWORD') ||
+            configService.get('SMS_MELIPAYAMAK_API_KEY'))
         );
 
       case DriverType.IPPANEL:
         return Boolean(
           configService.get('SMS_IPPANEL_API_KEY') &&
-            configService.get('SMS_IPPANEL_LINE_NUMBER')
+          configService.get('SMS_IPPANEL_LINE_NUMBER')
         );
 
       case DriverType.MOCK:
@@ -223,17 +239,11 @@ export class NestSmsConfigHelper {
         if (!configService.get('SMS_KAVENEGAR_API_KEY')) {
           missing.push('SMS_KAVENEGAR_API_KEY');
         }
-        if (!configService.get('SMS_KAVENEGAR_LINE_NUMBER')) {
-          missing.push('SMS_KAVENEGAR_LINE_NUMBER');
-        }
         break;
 
       case DriverType.SMSIR:
         if (!configService.get('SMS_SMSIR_API_KEY')) {
           missing.push('SMS_SMSIR_API_KEY');
-        }
-        if (!configService.get('SMS_SMSIR_LINE_NUMBER')) {
-          missing.push('SMS_SMSIR_LINE_NUMBER');
         }
         break;
 
@@ -275,6 +285,11 @@ SMS_DEFAULT_DRIVER=kavenegar
 
 # Global timeout for SMS requests (milliseconds)
 SMS_TIMEOUT=10000
+
+# Submission fallback is disabled unless explicitly enabled.
+# The requested/default driver is always attempted first; this is the remaining order.
+SMS_FALLBACK_ENABLED=false
+SMS_FALLBACK_ORDER=smsir,melipayamak,ippanel
 
 # Kavenegar Configuration
 SMS_KAVENEGAR_URL=https://api.kavenegar.com/v1/
